@@ -1,0 +1,119 @@
+#include "stdafx.h"
+#include<iostream>
+#include<conio.h>
+#include<fstream>
+using namespace std;
+unsigned counter;
+class BinarySearchTree {
+public:
+	int x; //root
+	BinarySearchTree *l, *r; //left,right
+};
+
+void print(BinarySearchTree *&Tree,unsigned level) {
+	if (Tree != NULL) {
+		print(Tree->r,level +1);
+		for (unsigned i = 0; i < level; ++i)cout << "-";
+		cout << Tree->x << endl;
+		print(Tree->l,level +1);
+	}
+}
+
+
+void print_all(BinarySearchTree *&Tree) {
+	print(*&Tree, 0);
+	cout << "\n" << counter << " elements";
+}
+
+void search(BinarySearchTree *&Tree, int x,unsigned level) {
+	if (Tree != NULL) {
+		search(Tree->r,x, level +1);
+		if (Tree->x == x) {
+			cout <<"\nElement "<<x<<" found in ";
+			cout << level << " level";
+		}
+		search(Tree->l,x, level +1);
+	}
+}
+
+void search_all(BinarySearchTree *&Tree, int x) {
+	search(*&Tree, x, 0);
+}
+
+void add_branch(int x, BinarySearchTree *&MyTree) {
+	if (MyTree == NULL) {
+		MyTree = new BinarySearchTree;
+		MyTree->x = x;
+		MyTree->l = MyTree->r = NULL;
+		counter++;
+	}
+	if (x < MyTree->x) { //going left
+		if (MyTree->l != NULL)add_branch(x, MyTree->l);
+		else {
+			MyTree->l = new BinarySearchTree;
+			MyTree->l->l = MyTree->l->r = NULL;
+			MyTree->l->x = x;
+			counter++;
+		}
+	}
+
+	if (x > MyTree->x) { //going right
+		if (MyTree->r != NULL)add_branch(x, MyTree->r);
+		else {
+			MyTree->r = new BinarySearchTree;
+			MyTree->r->l = MyTree->r->r = NULL;
+			MyTree->r->x = x;
+			counter++;
+		}
+	}
+}
+
+
+
+ofstream tree("tree.txt");
+void saveas(BinarySearchTree *&Tree) {
+if (Tree != NULL) {
+			saveas(Tree->l);
+			tree << Tree->x << " ";
+			saveas(Tree->r);
+		}	
+}
+
+void save(BinarySearchTree *&Tree) {
+	tree << "[ " << Tree->x << " ";
+	saveas(*&Tree);
+	tree << "]";
+	tree.close();
+}
+
+
+
+
+void clear(BinarySearchTree *&Tree) {
+	if (Tree != NULL) {
+		clear(Tree->l);
+		clear(Tree->r);
+		delete Tree;		
+	}
+}
+int main() {
+	BinarySearchTree *Tree = NULL;
+	add_branch(5, Tree);
+	add_branch(4, Tree);
+	add_branch(6, Tree);
+	add_branch(3, Tree);
+	add_branch(6, Tree);
+	add_branch(7, Tree);
+	add_branch(8, Tree);
+	print_all(Tree);
+
+	search_all(Tree, 6);
+	search_all(Tree, 8);
+
+	
+	save(Tree);
+ 
+	clear(Tree);
+	_getch();
+	return 0;
+}
